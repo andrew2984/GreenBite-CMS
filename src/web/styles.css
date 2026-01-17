@@ -545,6 +545,31 @@ input:focus, select:focus {
     transition: all 0.3s;
 }
 
+.btn-menu {
+    background-color: #68a062;
+    color: white;
+    margin-right: 8px;
+}
+
+.btn-menu:hover:not(:disabled) {
+    background-color: #5a8e54;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(104, 160, 98, 0.3);
+}
+
+.btn-menu.btn-disabled,
+.btn-menu:disabled {
+    background-color: #cccccc;
+    color: #888888;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btn-menu:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
 .btn-danger {
     background-color: #dc3545;
     color: white;

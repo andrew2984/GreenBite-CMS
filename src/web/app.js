@@ -514,6 +514,15 @@ function displayPlannerEvents(events) {
                         </div>
                     ` : ''}
                 </div>
+                <div class="event-card-actions" style="margin-top: 15px;">
+                    <button 
+                        class="btn-small btn-menu ${event.status !== 'accepted' ? 'btn-disabled' : ''}" 
+                        onclick="${event.status === 'accepted' ? `manageMenu(${event.id})` : 'return false;'}" 
+                        ${event.status !== 'accepted' ? 'disabled' : ''}
+                        title="${event.status !== 'accepted' ? 'Menu management available after event is accepted' : 'Manage event menu'}">
+                        📋 Manage Menu
+                    </button>
+                </div>
                 ${actionButtons}
             </div>
         `;
@@ -645,6 +654,13 @@ function displayEvents(events) {
                     ` : ''}
                 </div>
                 <div class="event-card-actions">
+                    <button 
+                        class="btn-small btn-menu ${event.status !== 'accepted' ? 'btn-disabled' : ''}" 
+                        onclick="${event.status === 'accepted' ? `manageMenu(${event.id})` : 'return false;'}" 
+                        ${event.status !== 'accepted' ? 'disabled' : ''}
+                        title="${event.status !== 'accepted' ? 'Menu management available after event is accepted' : 'Manage event menu'}">
+                        📋 Manage Menu
+                    </button>
                     ${event.status_code !== 10 ? `
                         <button class="btn-small btn-danger" onclick="cancelEvent(${event.id})">Cancel Event</button>
                     ` : ''}
@@ -739,6 +755,10 @@ async function cancelEvent(eventId) {
     } catch (error) {
         alert('Error: ' + error.message);
     }
+}
+
+function manageMenu(eventId) {
+    alert('🍽️ Menu Management System\n\nThis feature is coming soon! You will be able to:\n\n• Create and customize event menus\n• Select dishes and beverages\n• Set portion sizes\n• Manage dietary restrictions\n• Calculate menu costs\n\nStay tuned for updates!');
 }
 
 function navigateToAdminSystem(system) {
