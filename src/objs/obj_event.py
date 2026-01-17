@@ -1,9 +1,17 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean, ForeignKey, Table
 from sqlalchemy.orm import relationship
-from rich.table import Table
+from rich.table import Table as RichTable
 from rich.console import Console
 from ..db.database import Base
+
+# Association table for many-to-many relationship between events and planners
+event_planner_association = Table(
+    'event_planner',
+    Base.metadata,
+    Column('event_id', Integer, ForeignKey('events.id'), primary_key=True),
+    Column('planner_id', Integer, ForeignKey('users.id'), primary_key=True)
+)
 
 class Event(Base):
     __tablename__ = "events"
@@ -22,6 +30,7 @@ class Event(Base):
     payment_confirmed = Column(Boolean, default=False)
 
     user = relationship("CMSClientUser", back_populates="event")
+    planners = relationship("CMSEventPLanner", secondary=event_planner_association, back_populates="events")
 
     __status_lookup = [
         "uninitialised",
@@ -77,7 +86,7 @@ class Event(Base):
 
     @staticmethod
     def print_events_table(events):
-        table = Table(title="[bold cyan]Events[/bold cyan]")
+        table = RichTable(title="[bold cyan]Events[/bold cyan]")
         table.add_column("ID", style="cyan")
         table.add_column("Client", style="cyan")
         table.add_column("Email", style="cyan")
