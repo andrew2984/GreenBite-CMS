@@ -460,6 +460,10 @@ def assign_planners():
                 event.planners.append(planner)
                 assigned_count += 1
         
+        # Set status to pre-approval if planners are assigned
+        if assigned_count > 0:
+            event.set_status(2)  # pre-approval
+        
         db.commit()
         
         return jsonify({
