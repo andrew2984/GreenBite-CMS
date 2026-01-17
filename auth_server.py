@@ -329,6 +329,65 @@ def get_planner_events():
     finally:
         db.close()
 
+@app.route('/api/admin/events', methods=['GET'])
+def get_admin_events():
+    user_id = request.args.get('user_id')
+    db = SessionLocal()
+    
+    try:
+        if not user_id:
+            return jsonify({'success': False, 'message': 'Missing user_id'}), 400
+        
+        admin = db.query(CMSAdminUser).filter_by(id=int(user_id)).first()
+        if not admin:
+            return jsonify({'success': False, 'message': 'Admin not found'}), 404
+        
+        # Get all events in the system, sorted by date
+        all_events = db.query(Event).all()
+        events = sorted(all_events, key=lambda e: e.event_date if e.event_date else datetime.max)
+        
+        # Get all planners (filter by permission level 1)
+        planners = db.query(CMSEventPLanner).filter_by(permission_lvl=1).all()
+        planners_data = []
+        for planner in planners:
+            planners_data.append({
+                'id': planner.id,
+                'username': planner.user_name,
+                'email': planner.user_email
+            })
+        
+        events_data = []
+        for event in events:
+            # Get assigned planners for this event
+            assigned_planners = [str(p.id) for p in event.planners]
+            
+            events_data.append({
+                'id': event.id,
+                'title': event.title,
+                'client_name': event.client_name,
+                'client_email': event.client_email,
+                'event_date': event.event_date.isoformat() if event.event_date else None,
+                'location': event.location,
+                'notes': event.notes,
+                'price_total': event.price_total,
+                'status': event.get_status(verbose=True),
+                'status_code': event.status,
+                'payment_confirmed': event.payment_confirmed,
+                'assigned_planners': ','.join(assigned_planners) if assigned_planners else '',
+                'created_at': event.created_at.isoformat() if event.created_at else None
+            })
+        
+        return jsonify({
+            'success': True,
+            'events': events_data,
+            'planners': planners_data
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+    finally:
+        db.close()
+
 @app.route('/api/admin/assign-planner', methods=['POST'])
 def assign_planner():
     data = request.get_json()
@@ -363,6 +422,97 @@ def assign_planner():
         
     except PermissionError as e:
         return jsonify({'success': False, 'message': str(e)}), 403
+    except Exception as e:
+        db.rollback()
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+    finally:
+        db.close()
+
+@app.route('/api/admin/assign-planners', methods=['POST'])
+def assign_planners():
+    """Assign multiple planners to an event (replaces existing assignments)"""
+    data = request.get_json()
+    db = SessionLocal()
+    
+    try:
+        admin_id = data.get('user_id')
+        event_id = data.get('event_id')
+        planner_ids = data.get('planner_ids', [])
+        
+        if not admin_id or not event_id:
+            return jsonify({'success': False, 'message': 'Missing required fields'}), 400
+        
+        admin = db.query(CMSAdminUser).filter_by(id=int(admin_id)).first()
+        if not admin:
+            return jsonify({'success': False, 'message': 'Admin not found'}), 404
+        
+        event = Event.get_by_id(db, int(event_id))
+        if not event:
+            return jsonify({'success': False, 'message': 'Event not found'}), 404
+        
+        # Clear existing planners and assign new ones
+        event.planners.clear()
+        
+        assigned_count = 0
+        for planner_id in planner_ids:
+            planner = db.query(CMSEventPLanner).filter_by(id=int(planner_id)).first()
+            if planner:
+                event.planners.append(planner)
+                assigned_count += 1
+        
+        db.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': f'{assigned_count} planner(s) assigned successfully',
+            'event': {
+                'id': event.id,
+                'title': event.title,
+                'assigned_planner_count': assigned_count
+            }
+        }), 200
+        
+    except Exception as e:
+        db.rollback()
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+    finally:
+        db.close()
+
+@app.route('/api/admin/cancel-event', methods=['POST'])
+def cancel_event_admin():
+    """Admin endpoint to cancel an event"""
+    data = request.get_json()
+    db = SessionLocal()
+    
+    try:
+        admin_id = data.get('user_id')
+        event_id = data.get('event_id')
+        
+        if not all([admin_id, event_id]):
+            return jsonify({'success': False, 'message': 'Missing required fields'}), 400
+        
+        admin = db.query(CMSAdminUser).filter_by(id=int(admin_id)).first()
+        if not admin:
+            return jsonify({'success': False, 'message': 'Admin not found'}), 404
+        
+        event = Event.get_by_id(db, int(event_id))
+        if not event:
+            return jsonify({'success': False, 'message': 'Event not found'}), 404
+        
+        event.set_status(10)  # cancelled
+        db.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Event cancelled successfully',
+            'event': {
+                'id': event.id,
+                'title': event.title,
+                'status': event.get_status(verbose=True),
+                'status_code': event.status
+            }
+        }), 200
+        
     except Exception as e:
         db.rollback()
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
