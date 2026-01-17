@@ -9,7 +9,7 @@ class Event(Base):
     id = Column(Integer, primary_key=True)
     client_name = Column(String, nullable=False)
     client_email = Column(String, nullable=False)
-    booking_id = Column(Integer, ForeignKey("users.id"))
+    client_id = Column(Integer, ForeignKey("users.id"))
     event_date = Column(DateTime, nullable=False)
     status = Column(Integer, default=1)  # initialised
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -35,11 +35,11 @@ class Event(Base):
         "cancelled"
     ]
 
-    def __init__(self, client_name, client_email, booking_id, event_date,
+    def __init__(self, client_name, client_email, client_id, event_date,
                  location=None, notes=None, price_total=0.0):
         self.client_name = client_name
         self.client_email = client_email
-        self.booking_id = booking_id
+        self.client_id = client_id
         self.event_date = event_date
         self.location = location
         self.notes = notes
