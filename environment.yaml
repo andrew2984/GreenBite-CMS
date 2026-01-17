@@ -1,0 +1,12 @@
+name: greenbite-cms-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12.10
+  - sqlalchemy=2.0.45
+  - rich
+  - flask=2.3.3
+  - flask-cors=4.0.0
+  - flake8
+  - flake8-black
+prefix: C:\Users\ANT\.conda\envs\greenbite-cms-env
