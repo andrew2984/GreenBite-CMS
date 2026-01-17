@@ -329,5 +329,119 @@ def get_planner_events():
     finally:
         db.close()
 
+@app.route('/api/admin/assign-planner', methods=['POST'])
+def assign_planner():
+    data = request.get_json()
+    db = SessionLocal()
+    
+    try:
+        admin_id = data.get('admin_id')
+        event_id = data.get('event_id')
+        planner_id = data.get('planner_id')
+        
+        if not all([admin_id, event_id, planner_id]):
+            return jsonify({'success': False, 'message': 'Missing required fields'}), 400
+        
+        admin = db.query(CMSAdminUser).filter_by(id=int(admin_id)).first()
+        if not admin:
+            return jsonify({'success': False, 'message': 'Admin not found'}), 404
+        
+        if admin.assign_planner_to_event(db, int(event_id), int(planner_id)):
+            event = Event.get_by_id(db, int(event_id))
+            return jsonify({
+                'success': True,
+                'message': 'Planner assigned successfully and event status changed to pre-approval',
+                'event': {
+                    'id': event.id,
+                    'title': event.title,
+                    'status': event.get_status(verbose=True),
+                    'status_code': event.status
+                }
+            }), 200
+        else:
+            return jsonify({'success': False, 'message': 'Failed to assign planner or planner already assigned'}), 400
+        
+    except PermissionError as e:
+        return jsonify({'success': False, 'message': str(e)}), 403
+    except Exception as e:
+        db.rollback()
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+    finally:
+        db.close()
+
+@app.route('/api/planner/accept-event', methods=['POST'])
+def accept_event():
+    data = request.get_json()
+    db = SessionLocal()
+    
+    try:
+        user_id = data.get('user_id')
+        event_id = data.get('event_id')
+        
+        if not all([user_id, event_id]):
+            return jsonify({'success': False, 'message': 'Missing required fields'}), 400
+        
+        planner = db.query(CMSEventPLanner).filter_by(id=int(user_id)).first()
+        if not planner:
+            return jsonify({'success': False, 'message': 'Planner not found'}), 404
+        
+        if planner.accept_event(db, int(event_id)):
+            event = Event.get_by_id(db, int(event_id))
+            return jsonify({
+                'success': True,
+                'message': 'Event accepted successfully',
+                'event': {
+                    'id': event.id,
+                    'title': event.title,
+                    'status': event.get_status(verbose=True),
+                    'status_code': event.status
+                }
+            }), 200
+        else:
+            return jsonify({'success': False, 'message': 'Event not in pre-approval status or not assigned to planner'}), 400
+        
+    except Exception as e:
+        db.rollback()
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+    finally:
+        db.close()
+
+@app.route('/api/planner/decline-event', methods=['POST'])
+def decline_event():
+    data = request.get_json()
+    db = SessionLocal()
+    
+    try:
+        user_id = data.get('user_id')
+        event_id = data.get('event_id')
+        
+        if not all([user_id, event_id]):
+            return jsonify({'success': False, 'message': 'Missing required fields'}), 400
+        
+        planner = db.query(CMSEventPLanner).filter_by(id=int(user_id)).first()
+        if not planner:
+            return jsonify({'success': False, 'message': 'Planner not found'}), 404
+        
+        if planner.decline_event(db, int(event_id)):
+            event = Event.get_by_id(db, int(event_id))
+            return jsonify({
+                'success': True,
+                'message': 'Event declined successfully',
+                'event': {
+                    'id': event.id,
+                    'title': event.title,
+                    'status': event.get_status(verbose=True),
+                    'status_code': event.status
+                }
+            }), 200
+        else:
+            return jsonify({'success': False, 'message': 'Event not in pre-approval status or not assigned to planner'}), 400
+        
+    except Exception as e:
+        db.rollback()
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+    finally:
+        db.close()
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

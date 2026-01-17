@@ -19,6 +19,7 @@ class CMSAdminUser(CMSUser):
         
         if planner not in event.planners:
             event.planners.append(planner)
+            event.set_status(2)  # Change status to "pre-approval"
             db.commit()
             return True
         return False

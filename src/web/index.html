@@ -1576,6 +1576,14 @@
 
                 const statusClass = `status-${event.status.toLowerCase().replace(/ /g, '-')}`;
                 const isNext = index === 0 ? 'border-left: 4px solid #68a062; background-color: #f0f8f0;' : '';
+                
+                // Show action buttons for pre-approval events
+                const actionButtons = event.status === 'pre-approval' ? `
+                    <div class="event-action-buttons" style="margin-top: 15px; display: flex; gap: 10px;">
+                        <button class="btn-accept" onclick="acceptEvent(${event.id})" style="flex: 1; padding: 10px; background-color: #68a062; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 500;">✓ Accept</button>
+                        <button class="btn-decline" onclick="declineEvent(${event.id})" style="flex: 1; padding: 10px; background-color: #cd657a; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 500;">✗ Decline</button>
+                    </div>
+                ` : '';
 
                 return `
                     <div class="event-card" style="${isNext}">
@@ -1615,9 +1623,80 @@
                                 </div>
                             ` : ''}
                         </div>
+                        ${actionButtons}
                     </div>
                 `;
             }).join('') + '</div>';
+        }
+
+        async function acceptEvent(eventId) {
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            if (!user) {
+                alert('User not found');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/planner/accept-event`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        event_id: eventId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(`✓ Event "${data.event.title}" accepted successfully!`);
+                    loadPlannerEvents(user.id);
+                } else {
+                    alert(`Error: ${data.message}`);
+                }
+            } catch (error) {
+                console.error('Error accepting event:', error);
+                alert('Failed to accept event');
+            }
+        }
+
+        async function declineEvent(eventId) {
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            if (!user) {
+                alert('User not found');
+                return;
+            }
+
+            if (!confirm('Are you sure you want to decline this event? It can be reassigned to another planner.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/planner/decline-event`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        event_id: eventId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(`✗ Event "${data.event.title}" declined successfully. Event can now be reassigned.`);
+                    loadPlannerEvents(user.id);
+                } else {
+                    alert(`Error: ${data.message}`);
+                }
+            } catch (error) {
+                console.error('Error declining event:', error);
+                alert('Failed to decline event');
+            }
         }
 
         function updateEventCount(count) {

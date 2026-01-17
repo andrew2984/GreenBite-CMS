@@ -20,3 +20,29 @@ class CMSEventPLanner(CMSUser):
             Event.print_events_table(self.events)
         else:
             print("No events assigned to this planner.")
+    
+    def accept_event(self, db, event_id):
+        """Accept an event (change status from pre-approval to accepted)"""
+        event = Event.get_by_id(db, event_id)
+        if not event or event not in self.events:
+            return False
+        
+        if event.status == 2:  # pre-approval
+            event.set_status(3)  # accepted
+            db.commit()
+            return True
+        return False
+    
+    def decline_event(self, db, event_id):
+        """Decline an event (change status from pre-approval to declined)"""
+        event = Event.get_by_id(db, event_id)
+        if not event or event not in self.events:
+            return False
+        
+        if event.status == 2:  # pre-approval
+            event.set_status(4)  # declined
+            # Remove planner from event so it can be reassigned
+            self.events.remove(event)
+            db.commit()
+            return True
+        return False
