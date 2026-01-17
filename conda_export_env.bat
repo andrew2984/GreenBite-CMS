@@ -1,1 +1,1 @@
-conda export --from-history --format=environment-yaml --file=environment.yaml
+conda export --from-history --format=environment-yaml --file=environment.yml
