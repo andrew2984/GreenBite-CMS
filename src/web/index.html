@@ -604,6 +604,176 @@
                 grid-column: 1;
             }
         }
+
+        .btn-back {
+            background: linear-gradient(135deg, #68a062 0%, #8bc34a 100%);
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 8px 12px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            min-height: 44px;
+            font-weight: 600;
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(104, 160, 98, 0.4);
+        }
+
+        /* Planner Landing Page Styles */
+        .planner-landing {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: none;
+            animation: slideIn 0.3s ease-in-out;
+            padding: 40px;
+        }
+
+        .planner-landing.active {
+            display: block;
+        }
+
+        .planner-profile-card {
+            background: linear-gradient(135deg, #68a062 0%, #8bc34a 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(104, 160, 98, 0.3);
+        }
+
+        .planner-profile-info {
+            flex: 1;
+        }
+
+        .planner-profile-name {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .planner-profile-email {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .planner-profile-stats {
+            font-size: 13px;
+            opacity: 0.85;
+        }
+
+        .planner-profile-avatar {
+            font-size: 60px;
+            margin-right: 20px;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .planner-logout-btn {
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .planner-logout-btn:hover {
+            background-color: white;
+            color: #68a062;
+        }
+
+        .planner-systems-title {
+            color: #333;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .planner-systems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .system-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .system-card:hover {
+            border-color: #68a062;
+            box-shadow: 0 8px 20px rgba(104, 160, 98, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .system-card-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .system-card-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            text-transform: capitalize;
+        }
+
+        .system-card-description {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .planner-profile-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .planner-profile-avatar {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+
+            .planner-systems-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .planner-landing {
+                padding: 20px;
+            }
+
+            .planner-profile-name {
+                font-size: 24px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -803,6 +973,16 @@
 
                         <form onsubmit="handleCreateEvent(event)">
                             <div class="form-group">
+                                <label for="eventTitle">Event Title</label>
+                                <input 
+                                    type="text" 
+                                    id="eventTitle" 
+                                    placeholder="Enter event title"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
                                 <label for="eventDate">Event Date & Time</label>
                                 <input 
                                     type="datetime-local" 
@@ -853,6 +1033,121 @@
                             <div class="empty-state-icon">📭</div>
                             <div class="empty-state-text">No events yet</div>
                             <div style="font-size: 13px; color: #bbb;">Create your first event in the middle</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Planner Landing Page -->
+    <div class="planner-landing" id="plannerLanding">
+        <div class="planner-profile-card">
+            <div style="display: flex; align-items: center; flex: 1;">
+                <div class="planner-profile-avatar">🧑‍💻</div>
+                <div class="planner-profile-info">
+                    <div class="planner-profile-name" id="plannerLandingName"></div>
+                    <div class="planner-profile-email" id="plannerLandingEmail"></div>
+                    <div class="planner-profile-stats" id="plannerLandingStats">
+                        <span>📅 </span><span id="plannerLandingEventCount">0 events</span> <span>assigned</span>
+                    </div>
+                </div>
+            </div>
+            <button class="planner-logout-btn" onclick="logout()">Sign Out</button>
+        </div>
+
+        <div class="planner-systems-grid">
+            <div class="system-card" onclick="navigateToPlannerSystem('booking')">
+                <div class="system-card-icon">📅</div>
+                <div class="system-card-name">Booking</div>
+                <div class="system-card-description">Manage and view assigned events</div>
+            </div>
+
+            <div class="system-card" onclick="navigateToPlannerSystem('inventory')">
+                <div class="system-card-icon">📦</div>
+                <div class="system-card-name">Inventory</div>
+                <div class="system-card-description">Check-out inventory items & submit RTP</div>
+            </div>
+
+            <div class="system-card" onclick="navigateToPlannerSystem('finance')">
+                <div class="system-card-icon">💰</div>
+                <div class="system-card-name">Finance</div>
+                <div class="system-card-description">View events finance reports, paychecks & submit expense claims</div>
+            </div>
+
+            <div class="system-card" onclick="navigateToPlannerSystem('timetable')">
+                <div class="system-card-icon">⏰</div>
+                <div class="system-card-name">Timetable</div>
+                <div class="system-card-description">View your assigned weekly schedule </div>
+            </div>
+
+            <div class="system-card" onclick="navigateToPlannerSystem('chat')">
+                <div class="system-card-icon">💬</div>
+                <div class="system-card-name">Chat</div>
+                <div class="system-card-description">Team communication and messaging</div>
+            </div>
+
+            <div class="system-card" onclick="navigateToPlannerSystem('delivery')">
+                <div class="system-card-icon">🚚</div>
+                <div class="system-card-name">Delivery</div>
+                <div class="system-card-description">Track deliveries</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Planner Dashboard (Outside container for full width) -->
+    <div class="dashboard" id="plannerDashboard">
+            <div class="dashboard-header">
+                <div>
+                    <h1>📋 Assigned Events</h1>
+                </div>
+                <div class="dashboard-header-info">
+                    <div id="plannerDashboardUserName"></div>
+                    <div id="plannerDashboardUserEmail" style="font-size: 12px; margin-top: 5px;"></div>
+                </div>
+            </div>
+
+            <div class="dashboard-content">
+                <!-- User Information Section (LEFT) -->
+                <div class="dashboard-section user-section">
+                    <h2>Your Profile</h2>
+                    <div class="user-info-panel">
+                        <p>
+                            <strong>👤 Name</strong>
+                            <span id="plannerDashboardDisplayName"></span>
+                        </p>
+                        <p>
+                            <strong>📧 Email</strong>
+                            <span id="plannerDashboardDisplayEmail"></span>
+                        </p>
+                        <p style="margin-top: 20px;">
+                            <strong>📊 Assigned Events</strong>
+                            <span id="plannerEventCount">0 events</span>
+                        </p>
+                        <button type="button" class="btn-back" onclick="navigateToPlannerLanding()" title="Back to main" style="width: 100%; margin-top: 20px;">Back</button>
+                    </div>
+                </div>
+
+                <!-- Next Event Section (MIDDLE) -->
+                <div class="dashboard-section create-section">
+                    <h2>Next Event</h2>
+                    <div id="nextEventContainer">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <div class="empty-state-text">No upcoming events</div>
+                            <div style="font-size: 13px; color: #bbb;">You have no assigned events yet</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Events Section (RIGHT) -->
+                <div class="dashboard-section events-section">
+                    <h2>All Assigned Events</h2>
+                    <div id="plannerEventsContainer">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <div class="empty-state-text">No events assigned</div>
+                            <div style="font-size: 13px; color: #bbb;">Check back later for new assignments</div>
                         </div>
                     </div>
                 </div>
@@ -1049,14 +1344,18 @@
             const registerForm = document.getElementById('registerForm');
             const welcomePage = document.getElementById('welcomePage');
             const clientDashboard = document.getElementById('clientDashboard');
+            const plannerDashboard = document.getElementById('plannerDashboard');
+            const plannerLanding = document.getElementById('plannerLanding');
 
             loginForm.classList.remove('active');
             registerForm.classList.remove('active');
 
-            // If client, show dashboard; otherwise show welcome page
+            // If client, show client dashboard
             if (user.role === 'client') {
                 welcomePage.classList.remove('active');
                 clientDashboard.classList.add('active');
+                plannerDashboard.classList.remove('active');
+                plannerLanding.classList.remove('active');
                 document.body.classList.remove('login-view');
                 
                 // Populate dashboard info
@@ -1067,8 +1366,31 @@
                 
                 // Load events
                 loadClientEvents(user.id);
-            } else {
+            } 
+            // If planner, show planner landing page
+            else if (user.role === 'planner') {
+                welcomePage.classList.remove('active');
                 clientDashboard.classList.remove('active');
+                plannerDashboard.classList.remove('active');
+                plannerLanding.classList.add('active');
+                document.body.classList.remove('login-view');
+                
+                // Store user in session for navigation
+                sessionStorage.setItem('currentPlannerUser', JSON.stringify(user));
+                
+                // Populate landing page info
+                document.getElementById('plannerLandingName').textContent = user.username;
+                document.getElementById('plannerLandingEmail').textContent = user.email;
+                document.getElementById('plannerLandingEventCount').textContent = '0 events';
+                
+                // Load events
+                loadPlannerEvents(user.id);
+            }
+            // Otherwise show welcome page (for admin or other roles)
+            else {
+                clientDashboard.classList.remove('active');
+                plannerDashboard.classList.remove('active');
+                plannerLanding.classList.remove('active');
                 welcomePage.classList.add('active');
                 document.body.classList.add('login-view');
 
@@ -1084,6 +1406,29 @@
                 roleBadge.textContent = user.role.toUpperCase();
                 roleBadge.className = `role-badge ${user.role}`;
             }
+        }
+
+        function navigateToPlannerSystem(system) {
+            if (system === 'booking') {
+                // Show the booking dashboard
+                const plannerLanding = document.getElementById('plannerLanding');
+                const plannerDashboard = document.getElementById('plannerDashboard');
+                
+                plannerLanding.classList.remove('active');
+                plannerDashboard.classList.add('active');
+            } else {
+                // For now, show a message that other systems are coming soon
+                alert(`${system.charAt(0).toUpperCase() + system.slice(1)} system is coming soon!`);
+            }
+        }
+
+        function navigateToPlannerLanding() {
+            // Go back to the planner landing page
+            const plannerLanding = document.getElementById('plannerLanding');
+            const plannerDashboard = document.getElementById('plannerDashboard');
+            
+            plannerDashboard.classList.remove('active');
+            plannerLanding.classList.add('active');
         }
 
         async function loadClientEvents(userId) {
@@ -1103,6 +1448,176 @@
                 displayEvents([]);
                 updateEventCount(0);
             }
+        }
+
+        async function loadPlannerEvents(userId) {
+            try {
+                const response = await fetch(`${API_URL}/planner/events?user_id=${userId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    displayPlannerEvents(data.events);
+                    displayNextEvent(data.events);
+                    updatePlannerEventCount(data.events.length);
+                } else {
+                    displayPlannerEvents([]);
+                    displayNextEvent([]);
+                    updatePlannerEventCount(0);
+                }
+            } catch (error) {
+                console.error('Error loading planner events:', error);
+                displayPlannerEvents([]);
+                displayNextEvent([]);
+                updatePlannerEventCount(0);
+            }
+        }
+
+        function updatePlannerEventCount(count) {
+            document.getElementById('plannerEventCount').textContent = count + ' ' + (count === 1 ? 'event' : 'events');
+            // Also update the landing page count
+            const landingCountEl = document.getElementById('plannerLandingEventCount');
+            if (landingCountEl) {
+                landingCountEl.textContent = count + ' ' + (count === 1 ? 'event' : 'events');
+            }
+        }
+
+        function displayNextEvent(events) {
+            const container = document.getElementById('nextEventContainer');
+
+            if (events.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div class="empty-state-text">No upcoming events</div>
+                        <div style="font-size: 13px; color: #bbb;">You have no assigned events yet</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Get the first (next) event
+            const nextEvent = events[0];
+            const eventDate = new Date(nextEvent.event_date);
+            const formattedDate = eventDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const statusClass = `status-${nextEvent.status.toLowerCase().replace(/ /g, '-')}`;
+
+            container.innerHTML = `
+                <div class="event-card" style="border-left: 4px solid #68a062; background-color: #f0f8f0;">
+                    <div class="event-card-header">
+                        <div class="event-card-title" style="font-size: 16px; font-weight: bold;">🌟 ${nextEvent.title || `Next Event #${nextEvent.id}`}</div>
+                        <div class="event-status-badge ${statusClass}">${nextEvent.status}</div>
+                    </div>
+                    <div class="event-card-details">
+                        <div class="event-detail">
+                            <strong>👤 Client</strong>
+                            ${nextEvent.client_name}
+                        </div>
+                        <div class="event-detail">
+                            <strong>📧 Email</strong>
+                            ${nextEvent.client_email}
+                        </div>
+                        <div class="event-detail">
+                            <strong>📅 Date & Time</strong>
+                            ${formattedDate}
+                        </div>
+                        <div class="event-detail">
+                            <strong>💰 Budget</strong>
+                            $${nextEvent.price_total.toFixed(2)}
+                        </div>
+                        <div class="event-detail">
+                            <strong>📍 Location</strong>
+                            ${nextEvent.location || 'Not specified'}
+                        </div>
+                        <div class="event-detail">
+                            <strong>✓ Payment</strong>
+                            ${nextEvent.payment_confirmed ? '✅ Confirmed' : '⏳ Pending'}
+                        </div>
+                        ${nextEvent.notes ? `
+                            <div class="event-detail" style="grid-column: 1 / -1;">
+                                <strong>📝 Notes</strong>
+                                ${nextEvent.notes}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayPlannerEvents(events) {
+            const container = document.getElementById('plannerEventsContainer');
+
+            if (events.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div class="empty-state-text">No events assigned</div>
+                        <div style="font-size: 13px; color: #bbb;">Check back later for new assignments</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '<div class="events-list">' + events.map((event, index) => {
+                const eventDate = new Date(event.event_date);
+                const formattedDate = eventDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const statusClass = `status-${event.status.toLowerCase().replace(/ /g, '-')}`;
+                const isNext = index === 0 ? 'border-left: 4px solid #68a062; background-color: #f0f8f0;' : '';
+
+                return `
+                    <div class="event-card" style="${isNext}">
+                        <div class="event-card-header">
+                            <div class="event-card-title">${index === 0 ? '🌟 ' : ''}${event.title || `Event #${event.id}`}</div>
+                            <div class="event-status-badge ${statusClass}">${event.status}</div>
+                        </div>
+                        <div class="event-card-details">
+                            <div class="event-detail">
+                                <strong>👤 Client</strong>
+                                ${event.client_name}
+                            </div>
+                            <div class="event-detail">
+                                <strong>📧 Email</strong>
+                                ${event.client_email}
+                            </div>
+                            <div class="event-detail">
+                                <strong>📅 Date & Time</strong>
+                                ${formattedDate}
+                            </div>
+                            <div class="event-detail">
+                                <strong>💰 Budget</strong>
+                                $${event.price_total.toFixed(2)}
+                            </div>
+                            <div class="event-detail">
+                                <strong>📍 Location</strong>
+                                ${event.location || 'Not specified'}
+                            </div>
+                            <div class="event-detail">
+                                <strong>✓ Payment</strong>
+                                ${event.payment_confirmed ? '✅ Confirmed' : '⏳ Pending'}
+                            </div>
+                            ${event.notes ? `
+                                <div class="event-detail" style="grid-column: 1 / -1;">
+                                    <strong>📝 Notes</strong>
+                                    ${event.notes}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('') + '</div>';
         }
 
         function updateEventCount(count) {
@@ -1138,7 +1653,7 @@
                 return `
                     <div class="event-card">
                         <div class="event-card-header">
-                            <div class="event-card-title">Event #${event.id}</div>
+                            <div class="event-card-title">${event.title || `Event #${event.id}`}</div>
                             <div class="event-status-badge ${statusClass}">${event.status}</div>
                         </div>
                         <div class="event-card-details">
@@ -1179,6 +1694,7 @@
             event.preventDefault();
 
             const user = JSON.parse(sessionStorage.getItem('user'));
+            const title = document.getElementById('eventTitle').value;
             const eventDate = document.getElementById('eventDate').value;
             const location = document.getElementById('eventLocation').value;
             const notes = document.getElementById('eventNotes').value;
@@ -1202,6 +1718,7 @@
                     },
                     body: JSON.stringify({
                         user_id: user.id,
+                        title: title || null,
                         event_date: eventDate,
                         location: location || null,
                         notes: notes || null,
@@ -1213,6 +1730,7 @@
 
                 if (data.success) {
                     showMessage('createEventMessage', 'Event created successfully!', 'success');
+                    document.getElementById('eventTitle').value = '';
                     document.getElementById('eventDate').value = '';
                     document.getElementById('eventLocation').value = '';
                     document.getElementById('eventNotes').value = '';
@@ -1291,6 +1809,8 @@
             document.getElementById('loginForm').classList.add('active');
             document.getElementById('welcomePage').classList.remove('active');
             document.getElementById('clientDashboard').classList.remove('active');
+            document.getElementById('plannerDashboard').classList.remove('active');
+            document.getElementById('plannerLanding').classList.remove('active');
             document.body.classList.add('login-view');
             console.log('Login view activated');
 

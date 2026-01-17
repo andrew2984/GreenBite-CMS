@@ -171,6 +171,7 @@ def get_client_events():
         for event in events:
             events_data.append({
                 'id': event.id,
+                'title': event.title,
                 'event_date': event.event_date.isoformat() if event.event_date else None,
                 'location': event.location,
                 'notes': event.notes,
@@ -199,6 +200,7 @@ def create_event():
     try:
         user_id = data.get('user_id')
         event_date_str = data.get('event_date')
+        title = data.get('title')
         location = data.get('location')
         notes = data.get('notes')
         price_total = float(data.get('price_total', 0.0))
@@ -223,6 +225,7 @@ def create_event():
             client_email=user.user_email,
             client_id=user.id,
             event_date=event_date,
+            title=title,
             location=location,
             notes=notes,
             price_total=price_total
@@ -237,6 +240,7 @@ def create_event():
             'message': 'Event created successfully',
             'event': {
                 'id': new_event.id,
+                'title': new_event.title,
                 'event_date': new_event.event_date.isoformat(),
                 'location': new_event.location,
                 'notes': new_event.notes,
@@ -278,6 +282,49 @@ def cancel_event():
         
     except Exception as e:
         db.rollback()
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+    finally:
+        db.close()
+
+@app.route('/api/planner/events', methods=['GET'])
+def get_planner_events():
+    user_id = request.args.get('user_id')
+    db = SessionLocal()
+    
+    try:
+        if not user_id:
+            return jsonify({'success': False, 'message': 'Missing user_id'}), 400
+        
+        planner = db.query(CMSEventPLanner).filter_by(id=int(user_id)).first()
+        if not planner:
+            return jsonify({'success': False, 'message': 'Planner not found'}), 404
+        
+        # Get all events assigned to this planner, sorted by date
+        events = sorted(planner.events, key=lambda e: e.event_date if e.event_date else datetime.max)
+        
+        events_data = []
+        for event in events:
+            events_data.append({
+                'id': event.id,
+                'title': event.title,
+                'client_name': event.client_name,
+                'client_email': event.client_email,
+                'event_date': event.event_date.isoformat() if event.event_date else None,
+                'location': event.location,
+                'notes': event.notes,
+                'price_total': event.price_total,
+                'status': event.get_status(verbose=True),
+                'status_code': event.status,
+                'payment_confirmed': event.payment_confirmed,
+                'created_at': event.created_at.isoformat() if event.created_at else None
+            })
+        
+        return jsonify({
+            'success': True,
+            'events': events_data
+        }), 200
+        
+    except Exception as e:
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
     finally:
         db.close()

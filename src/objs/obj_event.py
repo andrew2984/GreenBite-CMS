@@ -20,6 +20,7 @@ class Event(Base):
     client_name = Column(String, nullable=False)
     client_email = Column(String, nullable=False)
     client_id = Column(Integer, ForeignKey("users.id"))
+    title = Column(String, nullable=True)
     event_date = Column(DateTime, nullable=False)
     status = Column(Integer, default=1)  # initialised
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -47,10 +48,11 @@ class Event(Base):
     ]
 
     def __init__(self, client_name, client_email, client_id, event_date,
-                 location=None, notes=None, price_total=0.0):
+                 title=None, location=None, notes=None, price_total=0.0):
         self.client_name = client_name
         self.client_email = client_email
         self.client_id = client_id
+        self.title = title
         self.event_date = event_date
         self.location = location
         self.notes = notes

@@ -9,12 +9,13 @@ class CMSClientUser(CMSUser):
     def get_events(self, db):
         return db.query(Event).filter_by(client_id=self.id).all() 
     
-    def request_event(self, db, event_date, location=None, notes=None, price_total=0.0):
+    def request_event(self, db, event_date, title=None, location=None, notes=None, price_total=0.0):
         new_event = Event(
             client_name=self.user_name,
             client_email=self.user_email,
             client_id=self.id,
             event_date=event_date,
+            title=title,
             location=location,
             notes=notes,
             price_total=price_total
