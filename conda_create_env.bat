@@ -1,5 +1,5 @@
 @echo off
-set condaEnvPath="./environment.yml"
+set condaEnvPath="./environment.yaml"
 set envName="greenbite-cms-env"
 @echo on
 
