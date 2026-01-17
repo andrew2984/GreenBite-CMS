@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import sys
 import os
+from datetime import datetime
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
@@ -10,6 +11,7 @@ from src.objs.user.obj_user import CMSUser
 from src.objs.user.obj_admin import CMSAdminUser
 from src.objs.user.obj_client import CMSClientUser
 from src.objs.user.obj_planner import CMSEventPLanner
+from src.objs.obj_event import Event
 
 Base.metadata.create_all(bind=engine)
 
@@ -151,6 +153,132 @@ def check_email():
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    finally:
+        db.close()
+
+@app.route('/api/client/events', methods=['GET'])
+def get_client_events():
+    user_id = request.args.get('user_id')
+    db = SessionLocal()
+    
+    try:
+        if not user_id:
+            return jsonify({'success': False, 'message': 'Missing user_id'}), 400
+        
+        events = db.query(Event).filter_by(client_id=int(user_id)).all()
+        
+        events_data = []
+        for event in events:
+            events_data.append({
+                'id': event.id,
+                'event_date': event.event_date.isoformat() if event.event_date else None,
+                'location': event.location,
+                'notes': event.notes,
+                'price_total': event.price_total,
+                'status': event.get_status(verbose=True),
+                'status_code': event.status,
+                'payment_confirmed': event.payment_confirmed,
+                'created_at': event.created_at.isoformat() if event.created_at else None
+            })
+        
+        return jsonify({
+            'success': True,
+            'events': events_data
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+    finally:
+        db.close()
+
+@app.route('/api/client/create-event', methods=['POST'])
+def create_event():
+    data = request.get_json()
+    db = SessionLocal()
+    
+    try:
+        user_id = data.get('user_id')
+        event_date_str = data.get('event_date')
+        location = data.get('location')
+        notes = data.get('notes')
+        price_total = float(data.get('price_total', 0.0))
+        
+        if not all([user_id, event_date_str]):
+            return jsonify({'success': False, 'message': 'Missing required fields'}), 400
+        
+        # Get user
+        user = db.query(CMSClientUser).filter_by(id=int(user_id)).first()
+        if not user:
+            return jsonify({'success': False, 'message': 'User not found'}), 404
+        
+        # Parse event date
+        try:
+            event_date = datetime.fromisoformat(event_date_str)
+        except ValueError:
+            return jsonify({'success': False, 'message': 'Invalid date format. Use ISO format (YYYY-MM-DD HH:mm)'}), 400
+        
+        # Create event
+        new_event = Event(
+            client_name=user.user_name,
+            client_email=user.user_email,
+            client_id=user.id,
+            event_date=event_date,
+            location=location,
+            notes=notes,
+            price_total=price_total
+        )
+        
+        db.add(new_event)
+        db.commit()
+        db.refresh(new_event)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Event created successfully',
+            'event': {
+                'id': new_event.id,
+                'event_date': new_event.event_date.isoformat(),
+                'location': new_event.location,
+                'notes': new_event.notes,
+                'price_total': new_event.price_total,
+                'status': new_event.get_status(verbose=True),
+                'created_at': new_event.created_at.isoformat()
+            }
+        }), 201
+        
+    except Exception as e:
+        db.rollback()
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+    finally:
+        db.close()
+
+@app.route('/api/client/cancel-event', methods=['POST'])
+def cancel_event():
+    data = request.get_json()
+    db = SessionLocal()
+    
+    try:
+        user_id = data.get('user_id')
+        event_id = data.get('event_id')
+        
+        if not all([user_id, event_id]):
+            return jsonify({'success': False, 'message': 'Missing required fields'}), 400
+        
+        event = db.query(Event).filter_by(id=int(event_id), client_id=int(user_id)).first()
+        if not event:
+            return jsonify({'success': False, 'message': 'Event not found'}), 404
+        
+        event.set_status(10)  # cancelled
+        db.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Event cancelled successfully'
+        }), 200
+        
+    except Exception as e:
+        db.rollback()
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
     finally:
         db.close()
 

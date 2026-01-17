@@ -17,26 +17,40 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             padding: 20px;
+        }
+
+        body.login-view {
+            align-items: center;
         }
 
         .container {
             width: 100%;
             max-width: 500px;
-        }
-
-        .form-container {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            padding: 40px;
             display: none;
         }
 
-        .form-container.active {
+        body.login-view .container {
             display: block;
+        }
+
+        .dashboard {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: none;
             animation: slideIn 0.3s ease-in-out;
+            position: relative;
+            z-index: 10;
+        }
+
+        .dashboard.active {
+            display: flex;
+            flex-direction: column;
         }
 
         @keyframes slideIn {
@@ -298,6 +312,236 @@
             display: block;
         }
 
+        .form-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+            animation: slideIn 0.3s ease-in-out;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #68a062 0%, #8bc34a 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .dashboard-header-info {
+            text-align: right;
+            font-size: 14px;
+        }
+
+        .dashboard-content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1fr;
+            gap: 25px;
+            width: 100%;
+        }
+
+        .dashboard-section {
+            min-width: 0;
+        }
+
+        .dashboard-section.user-section {
+            grid-column: 1;
+        }
+
+        .dashboard-section.create-section {
+            grid-column: 2;
+        }
+
+        .dashboard-section.events-section {
+            grid-column: 3;
+        }
+
+        .user-info-panel {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #68a062;
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+        }
+
+        .user-info-panel p {
+            margin: 15px 0;
+            font-size: 14px;
+        }
+
+        .user-info-panel strong {
+            display: block;
+            color: #333;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .dashboard-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 22px;
+            border-bottom: 2px solid #68a062;
+            padding-bottom: 10px;
+        }
+
+        .create-event-form {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 0;
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .form-row.full-span {
+            grid-column: 1 / -1;
+        }
+
+        .events-list {
+            display: grid;
+            gap: 15px;
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+        }
+
+        .event-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .event-card:hover {
+            border-color: #68a062;
+            box-shadow: 0 5px 15px rgba(104, 160, 98, 0.2);
+        }
+
+        .event-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .event-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .event-status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-initialised {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-payment-pending {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-confirmed {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .status-cancelled {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
+        .event-card-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .event-detail {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .event-detail strong {
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .event-card-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 13px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
         @media (max-width: 600px) {
             .form-container {
                 padding: 30px 20px;
@@ -321,6 +565,43 @@
 
             .welcome-icon {
                 font-size: 60px;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .dashboard-header-info {
+                text-align: center;
+                margin-top: 15px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .event-card-details {
+                grid-template-columns: 1fr;
+            }
+
+            .event-card-actions {
+                flex-direction: column;
+            }
+
+            .btn-small {
+                width: 100%;
+            }
+
+            .dashboard-content {
+                padding: 20px;
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-section.user-section,
+            .dashboard-section.create-section,
+            .dashboard-section.events-section {
+                grid-column: 1;
             }
         }
     </style>
@@ -459,7 +740,7 @@
             </p>
         </div>
 
-        <!-- Welcome Page -->
+        <!-- Welcome Page (for Planner and Admin) -->
         <div class="welcome-page" id="welcomePage">
             <div class="welcome-icon" id="welcomeIcon">👋</div>
             <h1>Welcome!</h1>
@@ -474,6 +755,108 @@
             <div class="role-badge" id="roleBadge"></div>
 
             <button class="btn btn-primary btn-logout" onclick="logout()">Sign Out</button>
+        </div>
+    </div>
+
+    <!-- Client Dashboard (Outside container for full width) -->
+    <div class="dashboard" id="clientDashboard">
+            <div class="dashboard-header">
+                <div>
+                    <h1>📋 Your Events</h1>
+                </div>
+                <div class="dashboard-header-info">
+                    <div id="dashboardUserName"></div>
+                    <div id="dashboardUserEmail" style="font-size: 12px; margin-top: 5px;"></div>
+                </div>
+            </div>
+
+            <div class="dashboard-content">
+                <!-- User Information Section (LEFT) -->
+                <div class="dashboard-section user-section">
+                    <h2>Your Profile</h2>
+                    <div class="user-info-panel">
+                        <p>
+                            <strong>👤 Name</strong>
+                            <span id="dashboardDisplayName"></span>
+                        </p>
+                        <p>
+                            <strong>📧 Email</strong>
+                            <span id="dashboardDisplayEmail"></span>
+                        </p>
+                        <p style="margin-top: 20px;">
+                            <strong>📊 Statistics</strong>
+                            <span id="dashboardEventCount">0 events</span>
+                        </p>
+                        <button class="btn btn-primary btn-logout" onclick="logout()" style="width: 100%; margin-top: 20px;">Sign Out</button>
+                    </div>
+                </div>
+
+                <!-- Create Event Section (MIDDLE) -->
+                <div class="dashboard-section create-section">
+                    <h2>Create New Event</h2>
+                    <div class="create-event-form">
+                        <div class="message" id="createEventMessage"></div>
+                        <div class="loading" id="createEventLoading">
+                            <div class="spinner"></div>
+                            <p>Creating event...</p>
+                        </div>
+
+                        <form onsubmit="handleCreateEvent(event)">
+                            <div class="form-group">
+                                <label for="eventDate">Event Date & Time</label>
+                                <input 
+                                    type="datetime-local" 
+                                    id="eventDate" 
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="eventLocation">Location</label>
+                                <input 
+                                    type="text" 
+                                    id="eventLocation" 
+                                    placeholder="Event location"
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="eventPrice">Estimated Budget ($)</label>
+                                <input 
+                                    type="number" 
+                                    id="eventPrice" 
+                                    placeholder="0.00"
+                                    step="0.01"
+                                    min="0"
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="eventNotes">Notes</label>
+                                <textarea 
+                                    id="eventNotes" 
+                                    placeholder="Add any notes about your event..."
+                                    style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 5px; font-size: 14px; font-family: inherit; resize: vertical; min-height: 100px;"
+                                ></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Create Event</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Events List Section (RIGHT) -->
+                <div class="dashboard-section events-section">
+                    <h2>Your Events</h2>
+                    <div id="eventsContainer">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <div class="empty-state-text">No events yet</div>
+                            <div style="font-size: 13px; color: #bbb;">Create your first event in the middle</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -665,22 +1048,221 @@
             const loginForm = document.getElementById('loginForm');
             const registerForm = document.getElementById('registerForm');
             const welcomePage = document.getElementById('welcomePage');
+            const clientDashboard = document.getElementById('clientDashboard');
 
             loginForm.classList.remove('active');
             registerForm.classList.remove('active');
-            welcomePage.classList.add('active');
 
-            // Update welcome page with user data
-            const config = roleConfig[user.role] || roleConfig.client;
-            document.getElementById('welcomeIcon').textContent = config.icon;
-            document.getElementById('welcomeMessage').textContent = config.message;
-            document.getElementById('displayName').textContent = user.username;
-            document.getElementById('displayEmail').textContent = user.email;
-            document.getElementById('displayRole').textContent = user.roleDisplay;
+            // If client, show dashboard; otherwise show welcome page
+            if (user.role === 'client') {
+                welcomePage.classList.remove('active');
+                clientDashboard.classList.add('active');
+                document.body.classList.remove('login-view');
+                
+                // Populate dashboard info
+                document.getElementById('dashboardUserName').textContent = user.username;
+                document.getElementById('dashboardUserEmail').textContent = user.email;
+                document.getElementById('dashboardDisplayName').textContent = user.username;
+                document.getElementById('dashboardDisplayEmail').textContent = user.email;
+                
+                // Load events
+                loadClientEvents(user.id);
+            } else {
+                clientDashboard.classList.remove('active');
+                welcomePage.classList.add('active');
+                document.body.classList.add('login-view');
 
-            const roleBadge = document.getElementById('roleBadge');
-            roleBadge.textContent = user.role.toUpperCase();
-            roleBadge.className = `role-badge ${user.role}`;
+                // Update welcome page with user data
+                const config = roleConfig[user.role] || roleConfig.client;
+                document.getElementById('welcomeIcon').textContent = config.icon;
+                document.getElementById('welcomeMessage').textContent = config.message;
+                document.getElementById('displayName').textContent = user.username;
+                document.getElementById('displayEmail').textContent = user.email;
+                document.getElementById('displayRole').textContent = user.roleDisplay;
+
+                const roleBadge = document.getElementById('roleBadge');
+                roleBadge.textContent = user.role.toUpperCase();
+                roleBadge.className = `role-badge ${user.role}`;
+            }
+        }
+
+        async function loadClientEvents(userId) {
+            try {
+                const response = await fetch(`${API_URL}/client/events?user_id=${userId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    displayEvents(data.events);
+                    updateEventCount(data.events.length);
+                } else {
+                    displayEvents([]);
+                    updateEventCount(0);
+                }
+            } catch (error) {
+                console.error('Error loading events:', error);
+                displayEvents([]);
+                updateEventCount(0);
+            }
+        }
+
+        function updateEventCount(count) {
+            document.getElementById('dashboardEventCount').textContent = count + ' ' + (count === 1 ? 'event' : 'events');
+        }
+
+        function displayEvents(events) {
+            const container = document.getElementById('eventsContainer');
+
+            if (events.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div class="empty-state-text">No events yet</div>
+                        <div style="font-size: 13px; color: #bbb;">Create your first event above to get started</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '<div class="events-list">' + events.map(event => {
+                const eventDate = new Date(event.event_date);
+                const formattedDate = eventDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const statusClass = `status-${event.status.toLowerCase().replace(/ /g, '-')}`;
+
+                return `
+                    <div class="event-card">
+                        <div class="event-card-header">
+                            <div class="event-card-title">Event #${event.id}</div>
+                            <div class="event-status-badge ${statusClass}">${event.status}</div>
+                        </div>
+                        <div class="event-card-details">
+                            <div class="event-detail">
+                                <strong>📅 Date & Time</strong>
+                                ${formattedDate}
+                            </div>
+                            <div class="event-detail">
+                                <strong>💰 Budget</strong>
+                                $${event.price_total.toFixed(2)}
+                            </div>
+                            <div class="event-detail">
+                                <strong>📍 Location</strong>
+                                ${event.location || 'Not specified'}
+                            </div>
+                            <div class="event-detail">
+                                <strong>✓ Payment</strong>
+                                ${event.payment_confirmed ? '✅ Confirmed' : '⏳ Pending'}
+                            </div>
+                            ${event.notes ? `
+                                <div class="event-detail" style="grid-column: 1 / -1;">
+                                    <strong>📝 Notes</strong>
+                                    ${event.notes}
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="event-card-actions">
+                            ${event.status_code !== 10 ? `
+                                <button class="btn-small btn-danger" onclick="cancelEvent(${event.id})">Cancel Event</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('') + '</div>';
+        }
+
+        async function handleCreateEvent(event) {
+            event.preventDefault();
+
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            const eventDate = document.getElementById('eventDate').value;
+            const location = document.getElementById('eventLocation').value;
+            const notes = document.getElementById('eventNotes').value;
+            const price = document.getElementById('eventPrice').value || 0;
+
+            if (!eventDate) {
+                showMessage('createEventMessage', 'Please select an event date', 'error');
+                return;
+            }
+
+            // Convert datetime-local to ISO format
+            const isoDate = new Date(eventDate).toISOString();
+
+            showLoading('createEventLoading', true);
+
+            try {
+                const response = await fetch(`${API_URL}/client/create-event`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        event_date: eventDate,
+                        location: location || null,
+                        notes: notes || null,
+                        price_total: parseFloat(price)
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('createEventMessage', 'Event created successfully!', 'success');
+                    document.getElementById('eventDate').value = '';
+                    document.getElementById('eventLocation').value = '';
+                    document.getElementById('eventNotes').value = '';
+                    document.getElementById('eventPrice').value = '';
+
+                    // Reload events
+                    setTimeout(() => {
+                        loadClientEvents(user.id);
+                        document.getElementById('createEventMessage').classList.remove('show');
+                    }, 1500);
+                } else {
+                    showMessage('createEventMessage', data.message || 'Failed to create event', 'error');
+                }
+            } catch (error) {
+                showMessage('createEventMessage', 'Error: ' + error.message, 'error');
+            } finally {
+                showLoading('createEventLoading', false);
+            }
+        }
+
+        async function cancelEvent(eventId) {
+            if (!confirm('Are you sure you want to cancel this event?')) {
+                return;
+            }
+
+            const user = JSON.parse(sessionStorage.getItem('user'));
+
+            try {
+                const response = await fetch(`${API_URL}/client/cancel-event`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        event_id: eventId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Reload events
+                    loadClientEvents(user.id);
+                } else {
+                    alert('Failed to cancel event: ' + data.message);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
         }
 
         function logout() {
@@ -694,6 +1276,8 @@
             // Show login form
             document.getElementById('loginForm').classList.add('active');
             document.getElementById('welcomePage').classList.remove('active');
+            document.getElementById('clientDashboard').classList.remove('active');
+            document.body.classList.add('login-view');
 
             clearMessages();
         }
@@ -703,6 +1287,8 @@
             const user = sessionStorage.getItem('user');
             if (user) {
                 showWelcomePage(JSON.parse(user));
+            } else {
+                document.body.classList.add('login-view');
             }
         });
     </script>
