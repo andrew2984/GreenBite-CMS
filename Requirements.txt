@@ -6,3 +6,25 @@ Flask-CORS==4.0.0
 bcrypt==4.1.2
 PyJWT==2.8.0
 Flask-Limiter==3.5.0
+# Testing Framework
+pytest==7.4.3
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+pytest-asyncio==0.21.1
+# Coverage Reporting
+coverage==7.3.2
+# Mocking and Fixtures
+faker==20.1.0
+# Flask Testing
+flask-testing==0.8.1
+# Code Quality
+pytest-flake8==1.1.1
+pytest-pylint==0.21.0
+# Performance Testing
+pytest-benchmark==4.0.0
+# Parallel Execution
+pytest-xdist==3.5.0
+# HTML Reports
+pytest-html==4.1.1
+# JSON Reports
+pytest-json-report==1.5.0
