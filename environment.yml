@@ -1,0 +1,13 @@
+name: greenbite-cms-env
+channels:
+  - conda-forge
+dependencies:
+  - flake8
+  - rich
+  - flake8-black
+  - python=3.12.10
+  - flask-cors=4.0.0
+  - flask=2.3.3
+  - sqlalchemy=2.0.45
+  - flask-limiter
+prefix: C:\Users\jessi\miniforge3\envs\greenbite-cms-env
