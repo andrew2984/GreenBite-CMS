@@ -1484,6 +1484,18 @@
     <script>
         const API_URL = 'http://localhost:5000/api';
 
+        // Helper function to get authentication headers
+        function getAuthHeaders() {
+            const token = sessionStorage.getItem('token');
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            return headers;
+        }
+
         // Role configurations
         const roleConfig = {
             client: {
@@ -1593,8 +1605,9 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    // Store user data in session storage
+                    // Store user data and JWT token in session storage
                     sessionStorage.setItem('user', JSON.stringify(data.user));
+                    sessionStorage.setItem('token', data.token);
                     
                     // Show welcome page
                     showWelcomePage(data.user);
@@ -1647,6 +1660,9 @@
                 const data = await response.json();
 
                 if (data.success) {
+                    // Store user data and JWT token
+                    sessionStorage.setItem('user', JSON.stringify(data.user));
+                    sessionStorage.setItem('token', data.token);
                     showMessage('registerMessage', data.message + ' Redirecting to login...', 'success');
                     
                     // Auto-populate login form and switch to it
@@ -1788,7 +1804,9 @@
 
         async function loadClientEvents(userId) {
             try {
-                const response = await fetch(`${API_URL}/client/events?user_id=${userId}`);
+                const response = await fetch(`${API_URL}/client/events`, {
+                    headers: getAuthHeaders()
+                });
                 const data = await response.json();
 
                 if (data.success) {
@@ -1807,7 +1825,9 @@
 
         async function loadPlannerEvents(userId) {
             try {
-                const response = await fetch(`${API_URL}/planner/events?user_id=${userId}`);
+                const response = await fetch(`${API_URL}/planner/events`, {
+                    headers: getAuthHeaders()
+                });
                 const data = await response.json();
 
                 if (data.success) {
@@ -1994,11 +2014,8 @@
             try {
                 const response = await fetch(`${API_URL}/planner/accept-event`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({
-                        user_id: user.id,
                         event_id: eventId
                     })
                 });
@@ -2031,11 +2048,8 @@
             try {
                 const response = await fetch(`${API_URL}/planner/decline-event`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({
-                        user_id: user.id,
                         event_id: eventId
                     })
                 });
@@ -2147,11 +2161,8 @@
             try {
                 const response = await fetch(`${API_URL}/client/create-event`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({
-                        user_id: user.id,
                         title: title || null,
                         event_date: eventDate,
                         location: location || null,
@@ -2195,11 +2206,8 @@
             try {
                 const response = await fetch(`${API_URL}/client/cancel-event`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({
-                        user_id: user.id,
                         event_id: eventId
                     })
                 });
@@ -2244,7 +2252,9 @@
 
         async function loadAdminEvents(userId) {
             try {
-                const response = await fetch(`${API_URL}/admin/events?user_id=${userId}`);
+                const response = await fetch(`${API_URL}/admin/events`, {
+                    headers: getAuthHeaders()
+                });
                 const data = await response.json();
 
                 if (data.success) {
@@ -2440,11 +2450,8 @@
             try {
                 const response = await fetch(`${API_URL}/admin/assign-planners`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({
-                        user_id: user.id,
                         event_id: eventId,
                         planner_ids: selectedPlannerIds
                     })
@@ -2485,11 +2492,8 @@
             try {
                 const response = await fetch(`${API_URL}/admin/cancel-event`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({
-                        user_id: user.id,
                         event_id: eventId
                     })
                 });
