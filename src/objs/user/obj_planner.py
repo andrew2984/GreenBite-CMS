@@ -2,6 +2,7 @@ from sqlalchemy.orm import relationship
 from .obj_user import CMSUser
 from ..obj_event import Event
 
+# Event Planner 
 class CMSEventPLanner(CMSUser):
     
     def view_all_events(self, db):
