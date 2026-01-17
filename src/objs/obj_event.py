@@ -3,21 +3,13 @@ from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean, Foreig
 from sqlalchemy.orm import relationship
 from ..db.database import Base
 
-class Booking(Base):
-    __tablename__ = "bookings"
-
-    id = Column(Integer, primary_key=True)
-    client_name = Column(String, nullable=False)
-    client_email = Column(String, nullable=False)
-    events = relationship("Event", back_populates="booking")
-
 class Event(Base):
     __tablename__ = "events"
 
     id = Column(Integer, primary_key=True)
     client_name = Column(String, nullable=False)
     client_email = Column(String, nullable=False)
-    booking_id = Column(Integer, ForeignKey("bookings.id"))
+    booking_id = Column(Integer, ForeignKey("users.id"))
     event_date = Column(DateTime, nullable=False)
     status = Column(Integer, default=1)  # initialised
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -27,7 +19,7 @@ class Event(Base):
     price_total = Column(Float, default=0.0)
     payment_confirmed = Column(Boolean, default=False)
 
-    booking = relationship("Booking", back_populates="events")
+    user = relationship("CMSClientUser", back_populates="event")
 
     __status_lookup = [
         "uninitialised",
