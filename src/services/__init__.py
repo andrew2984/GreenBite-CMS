@@ -8,9 +8,4 @@ from .event_service import EventService
 from .admin_service import AdminService
 from .planner_service import PlannerService
 
-__all__ = [
-    'AuthService',
-    'EventService',
-    'AdminService',
-    'PlannerService'
-]
+__all__ = ["AuthService", "EventService", "AdminService", "PlannerService"]

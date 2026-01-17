@@ -1,5 +1,14 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean, ForeignKey, Table
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    DateTime,
+    Float,
+    Boolean,
+    ForeignKey,
+    Table,
+)
 from sqlalchemy.orm import relationship
 from rich.table import Table as RichTable
 from rich.console import Console
@@ -7,11 +16,12 @@ from ..db.database import Base
 
 # Association table for many-to-many relationship between events and planners
 event_planner_association = Table(
-    'event_planner',
+    "event_planner",
     Base.metadata,
-    Column('event_id', Integer, ForeignKey('events.id'), primary_key=True),
-    Column('planner_id', Integer, ForeignKey('users.id'), primary_key=True)
+    Column("event_id", Integer, ForeignKey("events.id"), primary_key=True),
+    Column("planner_id", Integer, ForeignKey("users.id"), primary_key=True),
 )
+
 
 class Event(Base):
     __tablename__ = "events"
@@ -31,7 +41,9 @@ class Event(Base):
     payment_confirmed = Column(Boolean, default=False)
 
     user = relationship("CMSClientUser", back_populates="event")
-    planners = relationship("CMSEventPLanner", secondary=event_planner_association, back_populates="events")
+    planners = relationship(
+        "CMSEventPLanner", secondary=event_planner_association, back_populates="events"
+    )
 
     __status_lookup = [
         "uninitialised",
@@ -44,11 +56,20 @@ class Event(Base):
         "payment pending",
         "confirmed",
         "completed",
-        "cancelled"
+        "cancelled",
     ]
 
-    def __init__(self, client_name, client_email, client_id, event_date,
-                 title=None, location=None, notes=None, price_total=0.0):
+    def __init__(
+        self,
+        client_name,
+        client_email,
+        client_id,
+        event_date,
+        title=None,
+        location=None,
+        notes=None,
+        price_total=0.0,
+    ):
         self.client_name = client_name
         self.client_email = client_email
         self.client_id = client_id
@@ -97,7 +118,7 @@ class Event(Base):
         table.add_column("Status", style="yellow")
         table.add_column("Price", style="cyan")
         table.add_column("Payment", style="cyan")
-        
+
         for event in events:
             table.add_row(
                 str(event.id),
@@ -107,9 +128,9 @@ class Event(Base):
                 event.location or "N/A",
                 event.get_status(verbose=True),
                 f"£{event.price_total:.2f}",
-                "✓" if event.payment_confirmed else "✗"
+                "✓" if event.payment_confirmed else "✗",
             )
-        
+
         console = Console()
         console.print(table)
 
