@@ -278,7 +278,7 @@
         }
 
         .btn-logout {
-            background-color: #dc3545;
+            background-color: #cd657a;
             margin-top: 30px;
         }
 
@@ -754,7 +754,7 @@
 
             <div class="role-badge" id="roleBadge"></div>
 
-            <button class="btn btn-primary btn-logout" onclick="logout()">Sign Out</button>
+            <button type="button" class="btn btn-primary btn-logout" onclick="logout()">Sign Out</button>
         </div>
     </div>
 
@@ -787,7 +787,7 @@
                             <strong>📊 Statistics</strong>
                             <span id="dashboardEventCount">0 events</span>
                         </p>
-                        <button class="btn btn-primary btn-logout" onclick="logout()" style="width: 100%; margin-top: 20px;">Sign Out</button>
+                        <button type="button" class="btn btn-primary btn-logout" onclick="logout()" style="width: 100%; margin-top: 20px;">Sign Out</button>
                     </div>
                 </div>
 
@@ -1266,20 +1266,36 @@
         }
 
         function logout() {
+            console.log('Logout function called');
+            
             // Clear session storage
             sessionStorage.removeItem('user');
+            console.log('Session storage cleared');
 
-            // Reset forms
-            document.getElementById('loginForm').reset();
-            document.getElementById('registerForm').reset();
+            // Reset forms - find actual form elements within containers
+            const loginFormContainer = document.getElementById('loginForm');
+            const registerFormContainer = document.getElementById('registerForm');
+            
+            if (loginFormContainer) {
+                const loginForm = loginFormContainer.querySelector('form');
+                if (loginForm) loginForm.reset();
+            }
+            
+            if (registerFormContainer) {
+                const registerForm = registerFormContainer.querySelector('form');
+                if (registerForm) registerForm.reset();
+            }
+            console.log('Forms reset');
 
             // Show login form
             document.getElementById('loginForm').classList.add('active');
             document.getElementById('welcomePage').classList.remove('active');
             document.getElementById('clientDashboard').classList.remove('active');
             document.body.classList.add('login-view');
+            console.log('Login view activated');
 
             clearMessages();
+            console.log('Messages cleared - logout complete');
         }
 
         // Check if user is already logged in on page load
