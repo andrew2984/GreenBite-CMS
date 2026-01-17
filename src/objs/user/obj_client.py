@@ -4,7 +4,6 @@ from ..obj_event import Event
 
 class CMSClientUser(CMSUser):
     event = relationship("Event", back_populates="user")
-    pass
 
     @classmethod
     def get_events(self, db):

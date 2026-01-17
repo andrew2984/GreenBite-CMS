@@ -1,6 +1,8 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
+from rich.table import Table
+from rich.console import Console
 from ..db.database import Base
 
 class Event(Base):
@@ -73,5 +75,33 @@ class Event(Base):
     def get_events_for_client(cls, db, client_email):
         return db.query(cls).filter(cls.client_email == client_email).all()
 
+    @staticmethod
+    def print_events_table(events):
+        table = Table(title="[bold cyan]Events[/bold cyan]")
+        table.add_column("ID", style="cyan")
+        table.add_column("Client", style="cyan")
+        table.add_column("Email", style="cyan")
+        table.add_column("Event Date", style="cyan")
+        table.add_column("Location", style="cyan")
+        table.add_column("Status", style="yellow")
+        table.add_column("Price", style="cyan")
+        table.add_column("Payment", style="cyan")
+        
+        for event in events:
+            table.add_row(
+                str(event.id),
+                event.client_name,
+                event.client_email,
+                str(event.event_date),
+                event.location or "N/A",
+                event.get_status(verbose=True),
+                f"£{event.price_total:.2f}",
+                "✓" if event.payment_confirmed else "✗"
+            )
+        
+        console = Console()
+        console.print(table)
+
     def __repr__(self):
-        return f"<Event(id={self.id}, client={self.client_name}, status={self.get_status(True)}, date={self.event_date})>"
+        self.print_events_table([self])
+        # return f"<Event(id={self.id}, client_name={self.client_name}, client_email={self.client_email}, client_id={self.client_id}, event_date={self.event_date}, status={self.get_status(True)}, location={self.location}, notes={self.notes}, price_total={self.price_total}, payment_confirmed={self.payment_confirmed}, created_at={self.created_at}, updated_at={self.updated_at})>"
