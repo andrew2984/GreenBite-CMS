@@ -1,0 +1,32 @@
+@startuml GreenBite-CMS-System-Context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+
+title System Context Diagram for GreenBite CMS
+
+Person(client, "Client", "Customer booking catering services")
+Person(employee, "Employee", "Staff member assigned to events")
+Person(driver, "Delivery Driver", "Delivers catering to event locations")
+Person(planner, "Event Planner", "Manages events and assignments")
+Person(admin, "System Administrator", "Manages users and system configuration")
+
+System(greenbite_cms, "GreenBite CMS", "Comprehensive catering management system handling bookings, inventory, scheduling, finance, delivery, and internal communications")
+
+System_Ext(maps_api, "Maps Service", "Google Maps/Mapbox for route optimization and GPS tracking")
+System_Ext(payment_gateway, "Payment Gateway", "Stripe/PayPal for payment processing")
+System_Ext(notification_service, "Notification Service", "SendGrid/Twilio for email and SMS")
+System_Ext(file_storage, "Cloud Storage", "AWS S3/Azure Blob for file storage")
+
+Rel(client, greenbite_cms, "Books events, views invoices, tracks deliveries", "HTTPS")
+Rel(employee, greenbite_cms, "Views schedule, accesses assigned events", "HTTPS")
+Rel(driver, greenbite_cms, "Updates GPS location, views delivery routes", "HTTPS/WebSocket")
+Rel(planner, greenbite_cms, "Manages events, assigns staff, plans logistics", "HTTPS")
+Rel(admin, greenbite_cms, "Configures system, manages users, views audit logs", "HTTPS")
+
+Rel(greenbite_cms, maps_api, "Gets routes, calculates distances, traffic data", "HTTPS/API")
+Rel(greenbite_cms, payment_gateway, "Processes payments, generates invoices", "HTTPS/API")
+Rel(greenbite_cms, notification_service, "Sends email/SMS notifications", "HTTPS/API")
+Rel(greenbite_cms, file_storage, "Stores event files, invoices, attachments", "HTTPS/API")
+
+@enduml

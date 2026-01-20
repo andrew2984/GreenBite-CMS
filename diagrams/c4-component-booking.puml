@@ -1,0 +1,47 @@
+@startuml GreenBite-CMS-Component-Booking
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Component Diagram for Booking Service
+
+Container(api_gateway, "API Gateway", "AWS API Gateway", "Routes incoming requests")
+Container(auth_service, "Authentication Service", "Python/Flask", "Validates JWT tokens")
+
+Container_Boundary(booking_boundary, "Booking Service") {
+    Component(booking_controller, "Booking Controller", "Flask Route Handler", "Handles HTTP requests for bookings")
+    Component(validation_pipeline, "Validation Pipeline", "Python Class", "Multi-stage booking validation logic")
+    Component(event_manager, "Event Manager", "Python Class", "CRUD operations for events")
+    Component(client_comms, "Client Communications", "Python Class", "Manages client-booking interactions")
+    Component(planner_assignment, "Planner Assignment", "Python Class", "Assigns planners to validated events")
+
+    ComponentDb(booking_repository, "Booking Repository", "SQLAlchemy ORM", "Data access layer for events")
+}
+
+ContainerDb(database, "Database", "PostgreSQL", "Stores event data")
+Container(finance_service, "Finance Service", "Python/Flask", "Invoice generation")
+Container(message_queue, "Message Queue", "RabbitMQ", "Event notifications")
+ContainerDb(cache, "Cache", "Redis", "Temporary data storage")
+
+Rel(api_gateway, booking_controller, "Routes booking requests", "HTTPS/JSON")
+Rel(auth_service, booking_controller, "Validates user permissions", "Internal")
+
+Rel(booking_controller, validation_pipeline, "Validates booking request")
+Rel(booking_controller, event_manager, "Creates/updates events")
+Rel(booking_controller, client_comms, "Sends updates to clients")
+
+Rel(validation_pipeline, booking_repository, "Checks availability")
+Rel(validation_pipeline, cache, "Checks cached capacity", "Redis Protocol")
+Rel(validation_pipeline, finance_service, "Requests invoice generation", "HTTPS")
+
+Rel(event_manager, booking_repository, "Performs CRUD operations")
+Rel(event_manager, planner_assignment, "Assigns event to planner")
+Rel(event_manager, message_queue, "Publishes event created", "AMQP")
+
+Rel(planner_assignment, booking_repository, "Updates planner assignments")
+
+Rel(booking_repository, database, "Reads/writes event data", "SQL")
+
+Rel(client_comms, message_queue, "Sends client notifications", "AMQP")
+
+@enduml

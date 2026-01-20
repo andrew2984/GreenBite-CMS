@@ -1,0 +1,87 @@
+@startuml GreenBite-CMS-Container
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Container Diagram for GreenBite CMS
+
+Person(client, "Client", "Customer booking catering services")
+Person(employee, "Employee", "Staff member assigned to events")
+Person(driver, "Delivery Driver", "Delivers catering to event locations")
+Person(planner, "Event Planner", "Manages events and assignments")
+Person(admin, "System Administrator", "Manages system configuration")
+
+System_Boundary(greenbite_boundary, "GreenBite CMS") {
+    Container(web_app, "Web Application", "HTML, CSS, JavaScript", "Provides user interface for all user types via web browser")
+    Container(mobile_app, "Driver Mobile App", "Progressive Web App", "GPS tracking and delivery management for drivers")
+
+    Container(api_gateway, "API Gateway", "AWS API Gateway/Azure APIM", "Single entry point, handles routing, rate limiting, SSL termination")
+
+    Container(auth_service, "Authentication Service", "Python/Flask", "Handles user authentication, authorization, JWT tokens, session management")
+
+    Container(booking_service, "Booking Service", "Python/Flask", "Manages event bookings, validation pipeline, client communications")
+    Container(inventory_service, "Inventory Service", "Python/Flask", "Stock management, usage tracking, reorder alerts")
+    Container(scheduling_service, "Scheduling Service", "Python/Flask", "Employee schedules, shift management, availability tracking")
+    Container(finance_service, "Finance Service", "Python/Flask", "Invoice generation, payment tickets, financial reporting")
+    Container(delivery_service, "Delivery Service", "Python/Flask", "Route optimization, GPS tracking, driver assignments")
+    Container(communication_service, "Communication Service", "Python/Flask", "Event messages, file attachments, notifications")
+
+    ContainerDb(database, "Centralized Database", "PostgreSQL", "Stores events, users, employees, inventory, finances, delivery data (GDPR compliant)")
+    ContainerDb(cache, "Cache & Session Store", "Redis", "Caches frequently accessed data, stores sessions, real-time GPS data")
+    Container(message_queue, "Message Queue", "RabbitMQ/AWS SQS", "Asynchronous processing, event-driven updates")
+    ContainerDb(audit_store, "Audit Log Storage", "PostgreSQL/Dedicated", "GDPR compliance records, user actions, data access logs")
+}
+
+System_Ext(maps_api, "Maps Service", "Google Maps/Mapbox")
+System_Ext(payment_gateway, "Payment Gateway", "Stripe/PayPal")
+System_Ext(notification_service, "Notification Service", "SendGrid/Twilio")
+System_Ext(file_storage, "Cloud Storage", "AWS S3/Azure Blob")
+
+Rel(client, web_app, "Uses", "HTTPS")
+Rel(employee, web_app, "Uses", "HTTPS")
+Rel(planner, web_app, "Uses", "HTTPS")
+Rel(admin, web_app, "Uses", "HTTPS")
+Rel(driver, mobile_app, "Uses", "HTTPS/WebSocket")
+
+Rel(web_app, api_gateway, "Makes API calls", "HTTPS/JSON")
+Rel(mobile_app, api_gateway, "Makes API calls", "HTTPS/JSON")
+
+Rel(api_gateway, auth_service, "Authenticates requests", "HTTPS")
+Rel(api_gateway, booking_service, "Routes requests", "HTTPS")
+Rel(api_gateway, inventory_service, "Routes requests", "HTTPS")
+Rel(api_gateway, scheduling_service, "Routes requests", "HTTPS")
+Rel(api_gateway, finance_service, "Routes requests", "HTTPS")
+Rel(api_gateway, delivery_service, "Routes requests", "HTTPS")
+Rel(api_gateway, communication_service, "Routes requests", "HTTPS")
+
+Rel(auth_service, database, "Reads/writes user data", "SQL")
+Rel(auth_service, cache, "Stores sessions", "Redis Protocol")
+Rel(auth_service, audit_store, "Logs access", "SQL")
+
+Rel(booking_service, database, "Reads/writes events", "SQL")
+Rel(booking_service, finance_service, "Triggers invoice generation", "HTTPS")
+Rel(booking_service, message_queue, "Publishes event created", "AMQP")
+Rel(booking_service, cache, "Caches data", "Redis Protocol")
+
+Rel(inventory_service, database, "Reads/writes inventory", "SQL")
+Rel(inventory_service, cache, "Caches stock levels", "Redis Protocol")
+
+Rel(scheduling_service, database, "Reads/writes schedules", "SQL")
+Rel(scheduling_service, cache, "Caches schedules", "Redis Protocol")
+
+Rel(finance_service, database, "Reads/writes invoices, payments", "SQL")
+Rel(finance_service, payment_gateway, "Processes payments", "HTTPS/API")
+
+Rel(delivery_service, database, "Reads/writes delivery data", "SQL")
+Rel(delivery_service, cache, "Stores real-time GPS", "Redis Protocol")
+Rel(delivery_service, maps_api, "Gets routes, traffic", "HTTPS/API")
+Rel(delivery_service, message_queue, "Subscribes to events", "AMQP")
+
+Rel(communication_service, database, "Reads/writes messages", "SQL")
+Rel(communication_service, file_storage, "Stores attachments", "HTTPS/API")
+Rel(communication_service, notification_service, "Sends notifications", "HTTPS/API")
+
+Rel(message_queue, communication_service, "Triggers notifications", "AMQP")
+Rel(message_queue, delivery_service, "Triggers delivery assignment", "AMQP")
+
+@enduml

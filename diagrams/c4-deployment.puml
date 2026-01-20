@@ -1,0 +1,131 @@
+@startuml GreenBite-CMS-Deployment
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Deployment Diagram for GreenBite CMS (AWS)
+
+Deployment_Node(user_device, "User Device", "Desktop/Mobile Browser") {
+    Container(web_browser, "Web Browser", "Chrome/Firefox/Safari", "Client interface")
+}
+
+Deployment_Node(driver_device, "Driver Device", "Mobile Phone") {
+    Container(mobile_browser, "Mobile Browser/PWA", "Chrome Mobile", "Driver GPS tracking interface")
+}
+
+Deployment_Node(aws_cloud, "AWS Cloud", "Amazon Web Services") {
+    Deployment_Node(route53, "Route 53", "DNS Service") {
+        Container(dns, "DNS Records", "AWS Route 53", "Domain name resolution")
+    }
+
+    Deployment_Node(cloudfront, "CloudFront", "CDN") {
+        Container(cdn, "Static Content Cache", "CloudFront Distribution", "Caches static assets")
+    }
+
+    Deployment_Node(vpc, "VPC", "Virtual Private Cloud") {
+        Deployment_Node(public_subnet, "Public Subnet", "DMZ") {
+            Deployment_Node(alb, "Application Load Balancer", "Elastic Load Balancer") {
+                Container(load_balancer, "Load Balancer", "ALB", "Distributes traffic across instances")
+            }
+
+            Deployment_Node(api_gw, "API Gateway", "AWS Service") {
+                Container(api_gateway, "API Gateway", "AWS API Gateway", "API management and routing")
+            }
+        }
+
+        Deployment_Node(private_subnet, "Private Subnet", "Application Tier") {
+            Deployment_Node(ecs_cluster, "ECS Cluster", "Fargate/EC2") {
+                Deployment_Node(ecs_service_1, "ECS Service - Booking", "Container") {
+                    Container(booking_container, "Booking Service", "Docker Container", "Handles event bookings")
+                }
+
+                Deployment_Node(ecs_service_2, "ECS Service - Inventory", "Container") {
+                    Container(inventory_container, "Inventory Service", "Docker Container", "Manages inventory")
+                }
+
+                Deployment_Node(ecs_service_3, "ECS Service - Scheduling", "Container") {
+                    Container(scheduling_container, "Scheduling Service", "Docker Container", "Employee schedules")
+                }
+
+                Deployment_Node(ecs_service_4, "ECS Service - Finance", "Container") {
+                    Container(finance_container, "Finance Service", "Docker Container", "Invoice and payments")
+                }
+
+                Deployment_Node(ecs_service_5, "ECS Service - Delivery", "Container") {
+                    Container(delivery_container, "Delivery Service", "Docker Container", "Delivery tracking")
+                }
+
+                Deployment_Node(ecs_service_6, "ECS Service - Auth", "Container") {
+                    Container(auth_container, "Auth Service", "Docker Container", "Authentication")
+                }
+            }
+
+            Deployment_Node(elasticache, "ElastiCache", "Redis Cluster") {
+                ContainerDb(redis_cache, "Redis Cache", "ElastiCache Redis", "Session and data cache")
+            }
+        }
+
+        Deployment_Node(data_subnet, "Data Subnet", "Database Tier") {
+            Deployment_Node(rds, "RDS", "Multi-AZ Deployment") {
+                ContainerDb(postgres_primary, "PostgreSQL Primary", "RDS PostgreSQL", "Primary database")
+                ContainerDb(postgres_replica, "PostgreSQL Replica", "RDS PostgreSQL", "Read replica")
+            }
+        }
+    }
+
+    Deployment_Node(s3, "S3", "Object Storage") {
+        ContainerDb(file_bucket, "File Storage Bucket", "S3", "Event files and attachments")
+    }
+
+    Deployment_Node(sqs, "SQS", "Message Queue Service") {
+        Container(message_queue_svc, "Message Queue", "AWS SQS", "Asynchronous processing")
+    }
+}
+
+Deployment_Node(external_services, "External Services", "Third Party") {
+    System_Ext(maps_api, "Maps API", "Google Maps/Mapbox")
+    System_Ext(payment_gw, "Payment Gateway", "Stripe API")
+    System_Ext(notifications, "Notification Service", "SendGrid/Twilio")
+}
+
+Rel(web_browser, dns, "Resolves domain", "DNS")
+Rel(dns, cdn, "Routes to", "HTTPS")
+Rel(cdn, load_balancer, "Forwards requests", "HTTPS")
+Rel(mobile_browser, api_gateway, "API calls", "HTTPS")
+
+Rel(load_balancer, api_gateway, "Routes traffic", "HTTPS")
+
+Rel(api_gateway, auth_container, "Authenticates", "HTTPS")
+Rel(api_gateway, booking_container, "Routes", "HTTPS")
+Rel(api_gateway, inventory_container, "Routes", "HTTPS")
+Rel(api_gateway, scheduling_container, "Routes", "HTTPS")
+Rel(api_gateway, finance_container, "Routes", "HTTPS")
+Rel(api_gateway, delivery_container, "Routes", "HTTPS")
+
+Rel(booking_container, postgres_primary, "Reads/writes", "PostgreSQL Protocol")
+Rel(inventory_container, postgres_primary, "Reads/writes", "PostgreSQL Protocol")
+Rel(scheduling_container, postgres_primary, "Reads/writes", "PostgreSQL Protocol")
+Rel(finance_container, postgres_primary, "Reads/writes", "PostgreSQL Protocol")
+Rel(delivery_container, postgres_primary, "Reads/writes", "PostgreSQL Protocol")
+Rel(auth_container, postgres_primary, "Reads/writes", "PostgreSQL Protocol")
+
+Rel(booking_container, postgres_replica, "Reads", "PostgreSQL Protocol")
+Rel(inventory_container, postgres_replica, "Reads", "PostgreSQL Protocol")
+Rel(scheduling_container, postgres_replica, "Reads", "PostgreSQL Protocol")
+
+Rel(booking_container, redis_cache, "Caches", "Redis Protocol")
+Rel(inventory_container, redis_cache, "Caches", "Redis Protocol")
+Rel(delivery_container, redis_cache, "GPS data", "Redis Protocol")
+Rel(auth_container, redis_cache, "Sessions", "Redis Protocol")
+
+Rel(booking_container, message_queue_svc, "Publishes events", "HTTPS")
+Rel(delivery_container, message_queue_svc, "Subscribes", "HTTPS")
+
+Rel(booking_container, file_bucket, "Stores files", "HTTPS")
+Rel(finance_container, file_bucket, "Stores invoices", "HTTPS")
+
+Rel(finance_container, payment_gw, "Processes payments", "HTTPS")
+Rel(delivery_container, maps_api, "Route optimization", "HTTPS")
+Rel(booking_container, notifications, "Sends notifications", "HTTPS")
+
+@enduml
