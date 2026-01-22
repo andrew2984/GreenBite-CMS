@@ -13,7 +13,7 @@ class CMSUser(Base):
     id = Column(Integer, primary_key=True)
     user_name = Column(String, nullable=False)
     user_pswd = Column(String, nullable=False)  # Now stores hashed password
-    user_email = Column(String, nullable=False, unique=True)
+    user_email = Column(String(255), unique=True, nullable=False)
     permission_lvl = Column(Integer, nullable=False)
 
     def set_password(self, password: str):

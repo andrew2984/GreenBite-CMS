@@ -8,14 +8,32 @@ from datetime import datetime
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
-from src.db.database import SessionLocal, engine, Base
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from src.db.database import engine, Base
 from src.objs.user.obj_user import CMSUser
 from src.security.security_utils import require_auth, require_role
 from src.services import AuthService, EventService, AdminService, PlannerService
 
+# SQL Server connection setup
+server = "den1.mssql7.gear.host"
+database = "greenbite"
+username = "greenbite"
+password = "Kh5N7NS7!D_u"
+
+connection_string = (
+    f"mssql+pyodbc://{username}:{password}@{server}/{database}?driver=ODBC+Driver+17+for+SQL+Server"
+)
+
+engine = create_engine(connection_string, echo=True)
+Session = sessionmaker(bind=engine)
+
 Base.metadata.create_all(bind=engine)
 
-app = Flask(__name__)
+app = Flask(__name__,
+    static_folder='src/web',
+    static_url_path='')
 
 # Security Configuration
 # CORS: More permissive for development, restrict in production
@@ -42,7 +60,12 @@ def add_security_headers(response):
     response.headers['X-Frame-Options'] = 'DENY'
     response.headers['X-XSS-Protection'] = '1; mode=block'
     response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
-    response.headers['Content-Security-Policy'] = "default-src 'self'"
+    #response.headers['Content-Security-Policy'] = "default-src 'self'"
+    response.headers['Content-Security-Policy'] = (
+    "script-src 'self' 'unsafe-inline' 'unsafe-hashes'; "
+    "style-src 'self' 'unsafe-inline'; "
+    "connect-src http://localhost:5000 ws://localhost:5000"
+    )
     return response
 
 @app.route('/api/health', methods=['GET'])
@@ -53,7 +76,7 @@ def health_check():
 @limiter.limit("5 per minute")
 def register():
     data = request.get_json()
-    db = SessionLocal()
+    db = Session()
     try:
         username = data.get('username', '')
         email = data.get('email', '')
@@ -71,7 +94,7 @@ def register():
 @limiter.limit("10 per minute")
 def login():
     data = request.get_json()
-    db = SessionLocal()
+    db = Session()
     try:
         email = data.get('email', '')
         password = data.get('password', '')
@@ -86,7 +109,7 @@ def login():
 @app.route('/api/check-email', methods=['POST'])
 def check_email():
     data = request.get_json()
-    db = SessionLocal()
+    db = Session()
     try:
         email = data.get('email')
         exists, status_code = AuthService.check_email_exists(db, email)
@@ -99,7 +122,7 @@ def check_email():
 @app.route('/api/client/events', methods=['GET'])
 @require_auth
 def get_client_events():
-    db = SessionLocal()
+    db = Session()
     try:
         success, message, events_data, status_code = EventService.get_client_events(db, request.user_id)
         if success:
@@ -113,7 +136,7 @@ def get_client_events():
 @require_auth
 def create_event():
     data = request.get_json()
-    db = SessionLocal()
+    db = Session()
     try:
         success, message, event_data, status_code = EventService.create_event(
             db, request.user_id, data.get('event_date', ''), data.get('title', ''),
@@ -130,7 +153,7 @@ def create_event():
 @require_auth
 def cancel_event():
     data = request.get_json()
-    db = SessionLocal()
+    db = Session()
     try:
         success, message, status_code = EventService.cancel_event(db, request.user_id, data.get('event_id'))
         return jsonify({'success': success, 'message': message}), status_code
@@ -140,7 +163,7 @@ def cancel_event():
 @app.route('/api/planner/events', methods=['GET'])
 @require_role(1)
 def get_planner_events():
-    db = SessionLocal()
+    db = Session()
     try:
         success, message, events_data, status_code = PlannerService.get_planner_events(db, request.user_id)
         if success:
@@ -153,7 +176,7 @@ def get_planner_events():
 @app.route('/api/admin/events', methods=['GET'])
 @require_role(2)
 def get_admin_events():
-    db = SessionLocal()
+    db = Session()
     try:
         success, message, data, status_code = AdminService.get_all_events(db, request.user_id)
         if success:
@@ -167,7 +190,7 @@ def get_admin_events():
 @require_role(2)
 def assign_planner():
     data = request.get_json()
-    db = SessionLocal()
+    db = Session()
     try:
         success, message, event_data, status_code = AdminService.assign_planner_to_event(
             db, request.user_id, data.get('event_id'), data.get('planner_id')
@@ -183,7 +206,7 @@ def assign_planner():
 @require_role(2)
 def assign_planners():
     data = request.get_json()
-    db = SessionLocal()
+    db = Session()
     try:
         success, message, event_data, status_code = AdminService.assign_multiple_planners(
             db, request.user_id, data.get('event_id'), data.get('planner_ids', [])
@@ -199,7 +222,7 @@ def assign_planners():
 @require_role(2)
 def cancel_event_admin():
     data = request.get_json()
-    db = SessionLocal()
+    db = Session()
     try:
         success, message, event_data, status_code = AdminService.cancel_event(db, request.user_id, data.get('event_id'))
         if success:
@@ -213,7 +236,7 @@ def cancel_event_admin():
 @require_role(1)
 def accept_event():
     data = request.get_json()
-    db = SessionLocal()
+    db = Session()
     try:
         success, message, event_data, status_code = PlannerService.accept_event(db, request.user_id, data.get('event_id'))
         if success:
@@ -227,7 +250,7 @@ def accept_event():
 @require_role(1)
 def decline_event():
     data = request.get_json()
-    db = SessionLocal()
+    db = Session()
     try:
         success, message, event_data, status_code = PlannerService.decline_event(db, request.user_id, data.get('event_id'))
         if success:
