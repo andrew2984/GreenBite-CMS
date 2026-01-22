@@ -192,7 +192,7 @@ class AuthService:
             
         except Exception as e:
             SecurityLogger.log_suspicious_activity("Login error", str(e))
-            return False, 'Login failed. Please try again.', None, 500
+            return False, f'Login failed. Please try again.\n{str(e)}', None, 500
     
     @staticmethod
     def check_email_exists(db, email: str) -> Tuple[bool, int]:

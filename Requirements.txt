@@ -5,7 +5,7 @@ Flask-CORS==4.0.0
 Flask-Limiter
 python-decouple
 gunicorn
-pyodbc
+pymssql
 # Security dependencies
 bcrypt==4.1.2
 PyJWT==2.8.0
