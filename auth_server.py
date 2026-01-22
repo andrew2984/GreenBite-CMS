@@ -16,7 +16,7 @@ from src.objs.user.obj_user import CMSUser
 from src.security.security_utils import require_auth, require_role
 from src.services import AuthService, EventService, AdminService, PlannerService
 
-from src.objs.config import DevelopmentConfig
+from src.objs.config import DevelopmentConfig, DevServerConfig
 from decouple import config
 
 app = Flask(__name__,
@@ -25,14 +25,17 @@ app = Flask(__name__,
 
 env = config('FLASK_ENV', default='development')
 
-app.config.from_object(DevelopmentConfig)
+if env == "development":
+    app.config.from_object(DevelopmentConfig)
+elif env == "dev_server":
+    app.config.from_object(DevServerConfig)
 
 connection_string = app.config['CONNECTION_STRING']
 
 engine = create_engine(connection_string, echo=True)
 Session = sessionmaker(bind=engine)
 
-Base.metadata.create_all(bind=engine)
+#Base.metadata.create_all(bind=engine)
 
 # Security Configuration
 # CORS: More permissive for development, restrict in production
@@ -53,6 +56,8 @@ limiter = Limiter(
 )
 
 # Security Headers Middleware
+connect_src = app.config['CONNECT_SRC']
+
 @app.after_request
 def add_security_headers(response):
     response.headers['X-Content-Type-Options'] = 'nosniff'
@@ -63,7 +68,7 @@ def add_security_headers(response):
     response.headers['Content-Security-Policy'] = (
     "script-src 'self' 'unsafe-inline' 'unsafe-hashes'; "
     "style-src 'self' 'unsafe-inline'; "
-    "connect-src http://localhost:5000 ws://localhost:5000"
+    f"connect-src {connect_src}"
     )
     return response
 
