@@ -16,24 +16,23 @@ from src.objs.user.obj_user import CMSUser
 from src.security.security_utils import require_auth, require_role
 from src.services import AuthService, EventService, AdminService, PlannerService
 
-# SQL Server connection setup
-server = "den1.mssql7.gear.host"
-database = "greenbite"
-username = "greenbite"
-password = "Kh5N7NS7!D_u"
+from src.objs.config import DevelopmentConfig
+from decouple import config
 
-connection_string = (
-    f"mssql+pyodbc://{username}:{password}@{server}/{database}?driver=ODBC+Driver+17+for+SQL+Server"
-)
+app = Flask(__name__,
+    static_folder='src/web',
+    static_url_path='')
+
+env = config('FLASK_ENV', default='development')
+
+app.config.from_object(DevelopmentConfig)
+
+connection_string = app.config['CONNECTION_STRING']
 
 engine = create_engine(connection_string, echo=True)
 Session = sessionmaker(bind=engine)
 
 Base.metadata.create_all(bind=engine)
-
-app = Flask(__name__,
-    static_folder='src/web',
-    static_url_path='')
 
 # Security Configuration
 # CORS: More permissive for development, restrict in production
