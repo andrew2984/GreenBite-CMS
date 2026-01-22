@@ -1,10 +1,10 @@
 from typing import Tuple, Dict, Optional
 from datetime import datetime
-from ..objs.user.obj_user import CMSUser
-from ..objs.user.obj_admin import CMSAdminUser
-from ..objs.user.obj_client import CMSClientUser
-from ..objs.user.obj_planner import CMSEventPLanner
-from ..security.security_utils import (
+from src.objs.user.obj_user import CMSUser
+from src.objs.user.obj_admin import CMSAdminUser
+from src.objs.user.obj_client import CMSClientUser
+from src.objs.user.obj_planner import CMSEventPLanner
+from src.security.security_utils import (
     InputValidator,
     JWTManager,
     SecurityLogger

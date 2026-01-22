@@ -1,5 +1,3 @@
-const API_URL = 'http://localhost:5000/api';
-
 // Helper function to get authentication headers
 function getAuthHeaders() {
     const token = sessionStorage.getItem('token');

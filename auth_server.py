@@ -1,4 +1,4 @@
-﻿from flask import Flask, request, jsonify
+﻿from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -266,8 +266,8 @@ def decline_event():
 
 @app.route('/')
 def index():
-    from flask import send_from_directory
-    return send_from_directory('src/web', 'index.html')
+    api_url = app.config["API_URL"]
+    return render_template("index.html", api_url=api_url)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host='127.0.0.1')
