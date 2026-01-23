@@ -1,7 +1,7 @@
 import re
 import bcrypt
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from functools import wraps
 from flask import request, jsonify
 import html
@@ -205,17 +205,17 @@ class SecurityLogger:
     @staticmethod
     def log_failed_login(email: str, ip_address: str):
         """Log failed login attempt"""
-        timestamp = datetime.utcnow().isoformat()
+        timestamp = datetime.now(UTC).isoformat()
         print(f"[SECURITY] {timestamp} - Failed login attempt for {email} from {ip_address}")
     
     @staticmethod
     def log_successful_login(email: str, ip_address: str):
         """Log successful login"""
-        timestamp = datetime.utcnow().isoformat()
+        timestamp = datetime.now(UTC).isoformat()
         print(f"[SECURITY] {timestamp} - Successful login for {email} from {ip_address}")
     
     @staticmethod
     def log_suspicious_activity(activity: str, details: str):
         """Log suspicious activity"""
-        timestamp = datetime.utcnow().isoformat()
+        timestamp = datetime.now(UTC).isoformat()
         print(f"[SECURITY] {timestamp} - SUSPICIOUS: {activity} - {details}")
