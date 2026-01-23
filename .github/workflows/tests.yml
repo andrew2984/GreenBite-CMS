@@ -26,4 +26,4 @@ jobs:
         env:
           PYTHONPATH: .
         run: |
-          python -m pytest /home/runner/work/GreenBite-CMS/GreenBite-CMS/tests/test_auth_service.py
+          python -m pytest /home/runner/work/GreenBite-CMS/tests/test_auth_service.py
