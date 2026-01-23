@@ -1,10 +1,10 @@
 from typing import Tuple, Dict, Optional
 from datetime import datetime
-from ..objs.user.obj_user import CMSUser
-from ..objs.user.obj_admin import CMSAdminUser
-from ..objs.user.obj_client import CMSClientUser
-from ..objs.user.obj_planner import CMSEventPLanner
-from ..security.security_utils import (
+from src.objs.user.obj_user import CMSUser
+from src.objs.user.obj_admin import CMSAdminUser
+from src.objs.user.obj_client import CMSClientUser
+from src.objs.user.obj_planner import CMSEventPLanner
+from src.security.security_utils import (
     InputValidator,
     JWTManager,
     SecurityLogger
@@ -192,7 +192,7 @@ class AuthService:
             
         except Exception as e:
             SecurityLogger.log_suspicious_activity("Login error", str(e))
-            return False, 'Login failed. Please try again.', None, 500
+            return False, f'Login failed. Please try again.\n{str(e)}', None, 500
     
     @staticmethod
     def check_email_exists(db, email: str) -> Tuple[bool, int]:

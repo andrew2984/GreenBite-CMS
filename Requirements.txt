@@ -1,7 +1,11 @@
-SQLAlchemy==2.0.22
+SQLAlchemy==2.0.38
 rich
 Flask==2.3.3
 Flask-CORS==4.0.0
+Flask-Limiter
+python-decouple
+gunicorn
+pymssql
 # Security dependencies
 bcrypt==4.1.2
 PyJWT==2.8.0
